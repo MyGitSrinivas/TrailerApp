@@ -1,0 +1,114 @@
+﻿/*********************************************************************
+    HARDWARE	    :
+    MODULE		    :
+    VERSION	     	:
+    FILE NAME	    :
+    FILE DESCRIPTION:
+    NOTE			:
+*********************************************************************/
+#include "TrailerScreenManager.h"
+#include <iostream>
+
+TrailerScreenManager::TrailerScreenManager(DisplayType viewType, ITrailerLogicManager * trailerLogicManager)
+    : m_ViewType(viewType),
+      m_trailerLogicManager(trailerLogicManager),
+      m_AppDetails(NULL),
+      m_PrecedenceManager(NULL),
+      m_pNotificationManager(NULL)
+{
+    //std::cout << "TrailerScreenManager" << "\n";
+    LOG1((TEXT("TrailerScreenManager :: Constructor \n")));
+    m_AppDetails = new AppDetails(Settings, "Trailer", "", TRAILERMODULEID, "Trailer", Native, m_ViewType, TRAILERMODULEID);
+}
+
+TrailerScreenManager :: ~TrailerScreenManager()
+{
+    LOG1((TEXT("Trailer SM: Destructor n")));
+}
+
+unsigned int TrailerScreenManager::GetId()
+{
+    LOG1((TEXT("Trailer App SM:Enter in GetID\n")));
+    return TRAILERMODULEID;
+}
+
+const ScreenElementsList &TrailerScreenManager::GetScreenDataId(unsigned int screenName)
+{
+    LOG1((TEXT("Trailer SM:Enter in GetScreenDataId function\n")));
+}
+
+void TrailerScreenManager::Init(IHMIF *hmif)
+{
+    LOG1((TEXT("Trailer SM:Enter in Init function\n")));
+    if( NULL != hmif)
+    {
+        // Set Trailer Light Screen Element Map
+        SetScreens();
+
+        m_PrecedenceManager = hmif->GetPrecedenceManager();
+        m_pNotificationManager = hmif->GetNotificationManager();
+
+        //Initialize the Car Play logic manager
+        if(NULL != m_trailerLogicManager) {
+            m_trailerLogicManager->Init();
+        }
+        else {
+            LOGERR((TEXT("Trailer App SM:TrailerLogicManager is NULL\n")));
+        }
+    }
+}
+
+void TrailerScreenManager::Start()
+{
+    LOG1((TEXT("Trailer App SM:: Create Trailer App Native..\n")));
+    m_trailerLogicManager->Start();
+}
+
+void TrailerScreenManager::Activate(const bool &isActive)
+{
+    LOG1((TEXT("Trailer SM:Enter in Activate function\n")));
+}
+
+bool TrailerScreenManager::Stop()
+{
+    LOG1((TEXT("Trailer App SM:Enter in Stop function")));
+}
+
+const AppDetails *TrailerScreenManager::GetAppInfo()
+{
+    LOG1((TEXT("Trailer SM:Enter in GetAppInfo\n")));
+    return m_AppDetails;
+}
+
+ISimulator *TrailerScreenManager::GetSimulation()
+{
+    LOG1((TEXT("Trailer SM:Enter in GetSimulation function\n")));
+}
+
+void TrailerScreenManager::SetApplicationState(int state)
+{
+    LOG1((TEXT("Trailer SM:Enter in SetApplicationState function\n")));
+}
+
+void TrailerScreenManager::SetScreens()
+{
+    list<ScreenElement *> scTrailerMainScreenElementList;
+    m_ScreenElementMap[SC_TRAILER_LOW_RADIO_MAIN_SCREEN] = scTrailerMainScreenElementList;
+
+    list<ScreenElement *> scTrailerLightTestOnScreenElementList;
+    m_ScreenElementMap[SC_TRAILER_LIGHT_TEST_ON] = scTrailerLightTestOnScreenElementList;
+
+    list<ScreenElement *> scTrailerLightTestStoppedElementList;
+    m_ScreenElementMap[SC_TRAILER_LIGHT_TEST_STOPPED] = scTrailerLightTestStoppedElementList;
+}
+
+void TrailerScreenManager::SetEventMap()
+{
+    
+}
+
+const ScreenElementsMap &TrailerScreenManager::GetScreens()
+{
+    LOG1((TEXT("Trailer SM:Enter in GetScreens function\n")));
+    return m_ScreenElementMap;
+}
